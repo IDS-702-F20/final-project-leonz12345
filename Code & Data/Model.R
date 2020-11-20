@@ -22,6 +22,7 @@ nba$team_f <- factor(nba$Team)
 nba$win_lose_f <- factor(nba$WINorLOSS)
 nba$is_b2b_f <- factor(nba$Is_b2b)
 nba$is_b2b_opp_f <- factor(nba$Is_b2b_opp)
+nba$home_f <- factor(nba$Home)
 nba$DeffRebounds <- nba$TotalRebounds - nba$OffRebounds
 nba$Cumu.DeffRebounds <- nba$Cumu.TotalRebounds - nba$Cumu.OffRebounds
 nba$Cumu.Opp.DeffRebounds <- nba$Cumu.Opp.TotalRebounds - nba$Opp.OffRebounds
@@ -87,6 +88,7 @@ Final.Model <- glmer(win_lose_f~
                        Cumu.Turnovers.Diff+
                        Cumu.Streak.Diff+
                        Cumu.Records.Diff+
+                       home_f+
                        is_b2b_f+
                        is_b2b_opp_f+
                        (1|team_f)

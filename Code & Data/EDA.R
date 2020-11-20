@@ -23,7 +23,8 @@ nba$win_lose_f <- factor(nba$WINorLOSS)
 nba$is_b2b_f <- factor(nba$Is_b2b)
 nba$is_b2b_opp_f <- factor(nba$Is_b2b_opp)
 nba$DeffRebounds <- nba$TotalRebounds - nba$OffRebounds
-nba$FoulDiff <- nba$TotalFouls - nba$Opp.TotalFouls
+nba$FoulDiff <- nba$TotalFouls - nba$Opp.TotalFoul
+nba$home_f <- factor(nba$Home)
 
 # Subset data for Game# > 10
 mask <- nba['Game'] > 10
@@ -36,7 +37,7 @@ summary(nba_subset)
 
 # Compare the total team pts for winning games vs losing games
 # USEFUL PREDICTOR
-ggplot(nba_subset,aes(x=TeamPoints, y=win_lose_f, fill=win_lose_f)) +
+p1 <- ggplot(nba_subset,aes(x=TeamPoints, y=win_lose_f, fill=win_lose_f)) +
   geom_boxplot() + coord_flip() +
   scale_fill_brewer(palette="Reds") +
   labs(title="Total Team Points vs W/L") +
@@ -95,7 +96,7 @@ ggplot(nba_subset,aes(x=OffRebounds, y=win_lose_f, fill=win_lose_f)) +
 
 # Compare the Defensive Rebounds for winning games vs losing games
 # USEFUL PREDICTOR
-ggplot(nba_subset,aes(x=DeffRebounds, y=win_lose_f, fill=win_lose_f)) +
+p2 <- ggplot(nba_subset,aes(x=DeffRebounds, y=win_lose_f, fill=win_lose_f)) +
   geom_boxplot() + coord_flip() +
   scale_fill_brewer(palette="Reds") +
   labs(title="Defensive Rebound vs W/L") +
@@ -111,7 +112,7 @@ ggplot(nba_subset,aes(x=DeffRebounds, y=win_lose_f, fill=win_lose_f)) +
 # *************************************
 # Compare the Assist for winning games vs losing games
 # USEFUL PREDICTOR
-ggplot(nba_subset,aes(x=Assists, y=win_lose_f, fill=win_lose_f)) +
+p3 <- ggplot(nba_subset,aes(x=Assists, y=win_lose_f, fill=win_lose_f)) +
   geom_boxplot() + coord_flip() +
   scale_fill_brewer(palette="Reds") +
   labs(title="Assist vs W/L") +
@@ -131,7 +132,7 @@ ggplot(nba_subset,aes(x=Blocks, y=win_lose_f, fill=win_lose_f)) +
 
 # Compare the Turnover for winning games vs losing games
 # USEFUL PREDICTOR
-ggplot(nba_subset,aes(x=Turnovers, y=win_lose_f, fill=win_lose_f)) +
+p4 <- ggplot(nba_subset,aes(x=Turnovers, y=win_lose_f, fill=win_lose_f)) +
   geom_boxplot() + coord_flip() +
   scale_fill_brewer(palette="Reds") +
   labs(title="Turnovers vs W/L") +
@@ -163,7 +164,7 @@ ggplot(nba_subset,aes(x=FoulDiff, y=win_lose_f, fill=win_lose_f)) +
 
 # Compare the record for winning games vs losing games
 # USEFUL PREDICTOR
-ggplot(nba_subset,aes(x=Records, y=win_lose_f, fill=win_lose_f)) +
+p5 <- ggplot(nba_subset,aes(x=Records, y=win_lose_f, fill=win_lose_f)) +
   geom_boxplot() + coord_flip() +
   scale_fill_brewer(palette="Reds") +
   labs(title="Records vs W/L") +
@@ -181,7 +182,7 @@ ggplot(nba_subset,aes(Streak)) +
 # *************************************
 # Compare the streak for winning games vs losing games
 # USEFUL PREDICTOR
-ggplot(nba_subset,aes(x=Streak, y=win_lose_f, fill=win_lose_f)) +
+p6 <- ggplot(nba_subset,aes(x=Streak, y=win_lose_f, fill=win_lose_f)) +
   geom_boxplot() + coord_flip() +
   scale_fill_brewer(palette="Reds") +
   labs(title="Streak vs W/L") +
@@ -200,6 +201,11 @@ apply(table(b2b_wl)/sum(table(b2b_wl)),2, function(x) x/sum(x))
 # USEFUL PREDICTOR
 oppb2b_wl <- subset(nba_subset, select = c(win_lose_f, is_b2b_opp_f) )
 apply(table(oppb2b_wl)/sum(table(oppb2b_wl)),2, function(x) x/sum(x))
+
+home_f <- subset(nba_subset, select = c(win_lose_f, home_f) )
+apply(table(home_f)/sum(table(home_f)),2, function(x) x/sum(x))
+
+
 # *************************************
 
 #######################
@@ -216,6 +222,12 @@ ggplot(nba_subset,aes(x=FieldGoals, y=TeamPoints)) +
 # field goal percent vs total points
 # *** Super correlated: drop one
 chisq.test(nba_subset$FieldGoals., nba_subset$TeamPoints, simulate.p.value=TRUE)
+ggplot(nba_subset,aes(x=FieldGoals., y=TeamPoints)) +
+  geom_point(alpha = .7) +
+  geom_smooth(method="lm",col="red3") + theme_classic() +
+  labs(title="Field Goal % vs Team Points",x="Field Goal %",y="Team Points") +
+  theme(plot.title = element_text(hjust = 0.5))
+
 ggplot(nba_subset,aes(x=FieldGoals., y=TeamPoints)) +
   geom_point(alpha = .7) +
   geom_smooth(method="lm",col="red3") + theme_classic() +
@@ -332,6 +344,7 @@ ggplot(nba_subset,aes(x=FieldGoalsAttempted, y=FieldGoals.)) +
   theme(plot.title = element_text(hjust = 0.5))
 # *****************
 
+grid.arrange(p1, p2, p3, p4, p5, p6, ncol=2)
 
 ################
 # For modeling, try:
